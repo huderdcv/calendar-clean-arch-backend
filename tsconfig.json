@@ -1,0 +1,20 @@
+// tsconfig.json
+{
+  "compilerOptions": {
+    /* Base Options */
+    "target": "ES2022", // Compile to modern JavaScript
+    "module": "NodeNext", // Use Node.js's native ES Module system
+    "moduleResolution": "NodeNext", // How to find modules
+    "strict": true, // Enable all strict type-checking options
+    "esModuleInterop": true, // Helps with importing older modules
+
+    /* Output Options */
+    "outDir": "./dist", // Where to output compiled JavaScript
+    "rootDir": "./src", // Where your TypeScript source code lives
+
+    /* Other Options */
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*"] // Only compile files in the 'src' directory
+}
