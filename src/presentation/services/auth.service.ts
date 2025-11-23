@@ -2,7 +2,7 @@ import { bcryptAdapter } from '../../config/bcryptjs.adapter.js';
 import { jwtAdapter } from '../../config/jwt.adapter.js';
 import { UserModel } from '../../data/models/user.model.js';
 import { CustomError } from '../../domain/errors/index.js';
-import { CreateUserDto } from '../../domain/index.js';
+import { CreateUserDto, LoginUserDto } from '../../domain/index.js';
 
 export class AuthService {
   constructor() {}
@@ -38,5 +38,33 @@ export class AuthService {
     } catch (error) {
       throw CustomError.internalServer();
     }
+  }
+
+  async loginUser(loginUserDto: LoginUserDto) {
+    // verify if user exist
+    const userExists = await UserModel.findOne({ email: loginUserDto.email });
+    if (!userExists) throw CustomError.badRequest('This email is not register');
+
+    // verify if password match
+    const passMatch = bcryptAdapter.compare(
+      loginUserDto.password,
+      userExists.password
+    );
+    if (!passMatch) throw CustomError.badRequest('Password is incorrect');
+
+    // generate token
+    const token = await jwtAdapter.generate({
+      uid: userExists.id,
+      name: userExists.name,
+    });
+    if (!token) throw CustomError.internalServer('Internal server error');
+
+    // answer
+    return {
+      ok: true,
+      uid: userExists.id,
+      name: userExists.name,
+      token,
+    };
   }
 }
