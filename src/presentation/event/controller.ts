@@ -8,7 +8,9 @@ export class EventController {
 
   private handleError = (error: unknown, res: Response) => {
     if (error instanceof CustomError) {
-      return res.status(error.statusCode).json({ error: error.message });
+      return res
+        .status(error.statusCode)
+        .json({ ok: false, error: error.message });
     }
     console.log(error);
     console.log('mel');
@@ -67,9 +69,16 @@ export class EventController {
   };
 
   deleteEvent = async (req: Request, res: Response) => {
-    res.json({
-      ok: true,
-      msg: 'deleteEvent',
-    });
+    // gatther necesary data
+    const eventId = req.params.id;
+    const userId = req.user?.id;
+
+    //service
+    try {
+      const deletedEvent = await this.eventService.deleteEvent(eventId, userId);
+      res.json(deletedEvent);
+    } catch (error) {
+      this.handleError(error, res);
+    }
   };
 }

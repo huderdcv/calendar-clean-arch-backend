@@ -26,6 +26,18 @@ export class EventService {
     }
   }
 
+  async getEvents(paginationDto?: PaginationDto) {
+    try {
+      const events = await EventModel.find().populate('user', 'name');
+      return {
+        ok: true,
+        events,
+      };
+    } catch (error) {
+      throw CustomError.internalServer();
+    }
+  }
+
   async updateEvent(
     eventId: string,
     updateEventDto: UpdateEventDto,
@@ -53,12 +65,22 @@ export class EventService {
     }
   }
 
-  async getEvents(paginationDto?: PaginationDto) {
+  async deleteEvent(eventId: string, userId: string) {
+    const eventExists = await EventModel.findById(eventId);
+    if (!eventExists) throw CustomError.notFound('Event not found');
+
+    if (userId !== eventExists.user._id.toString()) {
+      console.log({ userId, user2: eventExists.user._id.toString() });
+      throw CustomError.unauthorized(
+        'You are not allowed to deleted this event'
+      );
+    }
+
     try {
-      const events = await EventModel.find().populate('user', 'name');
+      const deletedEvent = await EventModel.findByIdAndDelete(eventId);
       return {
         ok: true,
-        events,
+        deletedEvent,
       };
     } catch (error) {
       throw CustomError.internalServer();

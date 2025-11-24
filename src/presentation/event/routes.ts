@@ -16,14 +16,14 @@ export class EventRoutes {
       [AuthMiddleware.validateToken],
       eventController.createEvent
     );
-    router.put(
+    router.patch(
       '/:id',
       [AuthMiddleware.validateToken, MongoidMiddleware.verifyEventId],
       eventController.updateEvent
     );
     router.delete(
       '/:id',
-      [AuthMiddleware.validateToken],
+      [AuthMiddleware.validateToken, MongoidMiddleware.verifyEventId],
       eventController.deleteEvent
     );
 
