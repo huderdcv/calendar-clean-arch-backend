@@ -1,5 +1,9 @@
 import { Request, Response } from 'express';
-import { CreateUserDto, LoginUserDto } from '../../domain/index.js';
+import {
+  CreateUserDto,
+  LoginUserDto,
+  RevalidateTokenDto,
+} from '../../domain/index.js';
 import { CustomError } from '../../domain/errors/index.js';
 import { AuthService } from '../services/index.js';
 
@@ -40,9 +44,18 @@ export class AuthController {
     }
   };
 
-  async revalidateToken(req: Request, res: Response) {
-    res.json({
-      ok: true,
-    });
-  }
+  revalidateToken = async (req: Request, res: Response) => {
+    const [error, revalidateTokenDto] = RevalidateTokenDto.create(
+      req.user as object
+    );
+    if (error) return res.status(400).json({ error });
+    try {
+      const answer = await this.authService.revalidateToken(
+        revalidateTokenDto!
+      );
+      res.json(answer);
+    } catch (error) {
+      this.handleError(error, res);
+    }
+  };
 }

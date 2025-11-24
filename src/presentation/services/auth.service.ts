@@ -2,7 +2,11 @@ import { bcryptAdapter } from '../../config/bcryptjs.adapter.js';
 import { jwtAdapter } from '../../config/jwt.adapter.js';
 import { UserModel } from '../../data/models/user.model.js';
 import { CustomError } from '../../domain/errors/index.js';
-import { CreateUserDto, LoginUserDto } from '../../domain/index.js';
+import {
+  CreateUserDto,
+  LoginUserDto,
+  RevalidateTokenDto,
+} from '../../domain/index.js';
 
 export class AuthService {
   constructor() {}
@@ -64,6 +68,16 @@ export class AuthService {
       ok: true,
       uid: userExists.id,
       name: userExists.name,
+      token,
+    };
+  }
+
+  async revalidateToken({ id, name }: RevalidateTokenDto) {
+    const token = await jwtAdapter.generate({ uid: id, name: name });
+    if (!token) throw CustomError.internalServer('Error generating token');
+
+    return {
+      ok: true,
       token,
     };
   }
