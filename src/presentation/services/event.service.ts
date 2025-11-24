@@ -1,6 +1,10 @@
 import { EventModel } from '../../data/models/event.model.js';
 import { CustomError } from '../../domain/errors/custom.error.js';
-import { CreateEventDto, UpdateEventDto } from '../../domain/index.js';
+import {
+  CreateEventDto,
+  PaginationDto,
+  UpdateEventDto,
+} from '../../domain/index.js';
 
 export class EventService {
   constructor() {}
@@ -43,6 +47,18 @@ export class EventService {
       return {
         ok: true,
         event: updatedEvent,
+      };
+    } catch (error) {
+      throw CustomError.internalServer();
+    }
+  }
+
+  async getEvents(paginationDto?: PaginationDto) {
+    try {
+      const events = await EventModel.find().populate('user', 'name');
+      return {
+        ok: true,
+        events,
       };
     } catch (error) {
       throw CustomError.internalServer();

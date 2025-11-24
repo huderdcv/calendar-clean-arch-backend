@@ -16,10 +16,13 @@ export class EventController {
   };
 
   getEvents = async (req: Request, res: Response) => {
-    res.json({
-      ok: true,
-      msg: 'getEvents',
-    });
+    // TODO: add logic to sent pagination or not according to the users
+    try {
+      const events = await this.eventService.getEvents();
+      return res.json(events);
+    } catch (error) {
+      this.handleError(error, res);
+    }
   };
 
   createEvent = async (req: Request, res: Response) => {
