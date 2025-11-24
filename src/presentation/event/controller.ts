@@ -1,0 +1,72 @@
+import { Request, Response } from 'express';
+import { CreateEventDto, UpdateEventDto } from '../../domain/index.js';
+import { CustomError } from '../../domain/errors/index.js';
+import { EventService } from '../services/index.js';
+
+export class EventController {
+  constructor(private eventService: EventService) {}
+
+  private handleError = (error: unknown, res: Response) => {
+    if (error instanceof CustomError) {
+      return res.status(error.statusCode).json({ error: error.message });
+    }
+    console.log(error);
+    console.log('mel');
+    res.status(500).json({ error: 'Internal server error' });
+  };
+
+  getEvents = async (req: Request, res: Response) => {
+    res.json({
+      ok: true,
+      msg: 'getEvents',
+    });
+  };
+
+  createEvent = async (req: Request, res: Response) => {
+    // dtos
+    const [error, createEventDto] = CreateEventDto.create({
+      ...req.body,
+      user: req.user?.id,
+    });
+    if (error) return res.status(400).json({ error });
+
+    // service
+    try {
+      const answer = await this.eventService.createEvent(createEventDto!);
+      res.json(answer);
+    } catch (error) {
+      this.handleError(error, res);
+    }
+  };
+
+  updateEvent = async (req: Request, res: Response) => {
+    // getting the id event
+    const eventId = req.params.id;
+
+    // getting the id user
+    const userId = req.user?.id;
+
+    // getting the dto body
+    const [error, updateEventDto] = UpdateEventDto.create(req.body);
+    if (error) return res.status(400).json({ error });
+
+    // service
+    try {
+      const event = await this.eventService.updateEvent(
+        eventId,
+        updateEventDto!,
+        userId
+      );
+      res.json(event);
+    } catch (error) {
+      this.handleError(error, res);
+    }
+  };
+
+  deleteEvent = async (req: Request, res: Response) => {
+    res.json({
+      ok: true,
+      msg: 'deleteEvent',
+    });
+  };
+}

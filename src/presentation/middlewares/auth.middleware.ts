@@ -25,9 +25,13 @@ export class AuthMiddleware {
 
       // getting user
       const user = await UserModel.findById(payload.uid);
-      if (!user) return res.status(500).json({ error: 'Invalid token - user' });
+      if (!user) return res.status(401).json({ error: 'Invalid token - user' });
 
-      // add user in the body
+      //TODO: FIX 2: Check if user is active (Security Best Practice)
+      // Assuming your model has an 'isActive' or 'status' field
+      // if (!user.isActive) return res.status(401).json({ error: 'User is inactive' });
+
+      // add user in the
       req.user = user;
 
       next();
