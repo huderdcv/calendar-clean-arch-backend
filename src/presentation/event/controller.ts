@@ -13,8 +13,7 @@ export class EventController {
         .json({ ok: false, error: error.message });
     }
     console.log(error);
-    console.log('mel');
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ ok: false, error: 'Internal server error' });
   };
 
   getEvents = async (req: Request, res: Response) => {
@@ -33,7 +32,7 @@ export class EventController {
       ...req.body,
       user: req.user?.id,
     });
-    if (error) return res.status(400).json({ error });
+    if (error) return res.status(400).json({ ok: false, error });
 
     // service
     try {
@@ -53,7 +52,7 @@ export class EventController {
 
     // getting the dto body
     const [error, updateEventDto] = UpdateEventDto.create(req.body);
-    if (error) return res.status(400).json({ error });
+    if (error) return res.status(400).json({ ok: false, error });
 
     // service
     try {

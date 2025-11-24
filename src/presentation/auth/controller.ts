@@ -13,16 +13,18 @@ export class AuthController {
   //general
   private handleError = (error: unknown, res: Response) => {
     if (error instanceof CustomError) {
-      return res.status(error.statusCode).json({ error: error.message });
+      return res
+        .status(error.statusCode)
+        .json({ ok: false, error: error.message });
     }
     console.log({ error });
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ ok: false, error: 'Internal server error' });
   };
 
   //methods
   createUser = async (req: Request, res: Response) => {
     const [error, createUserDto] = CreateUserDto.create(req.body);
-    if (error) return res.status(400).json({ error });
+    if (error) return res.status(400).json({ ok: false, error });
     try {
       const user = await this.authService.createUser(createUserDto!);
       return res.json(user);
@@ -34,7 +36,7 @@ export class AuthController {
 
   loginUser = async (req: Request, res: Response) => {
     const [error, loginUserDto] = LoginUserDto.create(req.body);
-    if (error) return res.status(400).json({ error });
+    if (error) return res.status(400).json({ ok: false, error });
 
     try {
       const user = await this.authService.loginUser(loginUserDto!);
@@ -48,7 +50,7 @@ export class AuthController {
     const [error, revalidateTokenDto] = RevalidateTokenDto.create(
       req.user as object
     );
-    if (error) return res.status(400).json({ error });
+    if (error) return res.status(400).json({ ok: false, error });
     try {
       const answer = await this.authService.revalidateToken(
         revalidateTokenDto!

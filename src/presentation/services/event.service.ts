@@ -19,9 +19,11 @@ export class EventService {
     try {
       const newEvent = new EventModel(createEventDto);
       await newEvent.save();
-      return newEvent;
+      return {
+        ok: true,
+        event: newEvent,
+      };
     } catch (error) {
-      console.log('mel 2');
       throw CustomError.internalServer();
     }
   }
