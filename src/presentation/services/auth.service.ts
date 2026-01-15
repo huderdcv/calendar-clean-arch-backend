@@ -79,6 +79,8 @@ export class AuthService {
     return {
       ok: true,
       token,
+      uid: id,
+      name,
     };
   }
 }
